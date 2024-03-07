@@ -4,7 +4,7 @@ import redis from '@umami/redis-client';
 import { getAuthToken, parseShareToken } from 'lib/auth';
 import { ROLES } from 'lib/constants';
 import { secret } from 'lib/crypto';
-import { findSession } from 'lib/session';
+import { findVisitor } from 'lib/visitor';
 import {
   badRequest,
   createMiddleware,
@@ -25,16 +25,16 @@ export const useCors = createMiddleware(
   }),
 );
 
-export const useSession = createMiddleware(async (req, res, next) => {
+export const useVisitor = createMiddleware(async (req, res, next) => {
   try {
-    const session = await findSession(req as NextApiRequestCollect);
+    const visitor = await findVisitor(req as NextApiRequestCollect);
 
-    if (!session) {
-      log('useSession: Session not found');
-      return badRequest(res, 'Session not found.');
+    if (!visitor) {
+      log('useVisitor: Visitor not found');
+      return badRequest(res, 'Visitor not found.');
     }
 
-    (req as any).session = session;
+    (req as any).visitor = visitor;
   } catch (e: any) {
     if (e.message === 'Usage Limit.') {
       return tooManyRequest(res, e.message);

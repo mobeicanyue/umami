@@ -14,7 +14,7 @@ export async function getWebsiteStats(...args: [websiteId: string, filters: Quer
 async function relationalQuery(websiteId: string, filters: QueryFilters) {
   const { getDateQuery, getAddIntervalQuery, getTimestampDiffQuery, parseFilters, rawQuery } =
     prisma;
-  const { filterQuery, joinSession, params } = await parseFilters(websiteId, {
+  const { filterQuery, joinVisitor, params } = await parseFilters(websiteId, {
     ...filters,
     eventType: EVENT_TYPE.pageView,
   });
@@ -23,14 +23,14 @@ async function relationalQuery(websiteId: string, filters: QueryFilters) {
     `
     select
       sum(t.c) as "pageviews",
-      count(distinct t.session_id) as "uniques",
+      count(distinct t.visitor_id) as "uniques",
       sum(case when t.c = 1 then 1 else 0 end) as "bounces",
       sum(case when t.max_time < ${getAddIntervalQuery('t.min_time', '1 hour')}
         then ${getTimestampDiffQuery('t.min_time', 't.max_time')}
         else 0 end) as "totaltime"
     from (
       select
-        website_event.session_id,
+        website_event.visitor_id,
         ${getDateQuery('website_event.created_at', 'hour')},
         count(*) as "c",
         min(website_event.created_at) as "min_time",
@@ -38,7 +38,7 @@ async function relationalQuery(websiteId: string, filters: QueryFilters) {
       from website_event
       join website 
         on website_event.website_id = website.website_id
-        ${joinSession}
+        ${joinVisitor}
       where website.website_id = {{websiteId::uuid}}
         and website_event.created_at between {{startDate}} and {{endDate}}
         and event_type = {{eventType}}
@@ -64,12 +64,12 @@ async function clickhouseQuery(
     `
     select 
       sum(t.c) as "pageviews",
-      count(distinct t.session_id) as "uniques",
+      count(distinct t.visitor_id) as "uniques",
       sum(if(t.c = 1, 1, 0)) as "bounces",
       sum(if(max_time < min_time + interval 1 hour, max_time-min_time, 0)) as "totaltime"
     from (
       select
-        session_id,
+        visitor_id,
         ${getDateQuery('created_at', 'hour')} time_series,
         count(*) c,
         min(created_at) min_time,
@@ -79,7 +79,7 @@ async function clickhouseQuery(
         and created_at between {startDate:DateTime64} and {endDate:DateTime64}
         and event_type = {eventType:UInt32}
         ${filterQuery}
-      group by session_id, time_series
+      group by visitor_id, time_series
     ) as t;
     `,
     params,

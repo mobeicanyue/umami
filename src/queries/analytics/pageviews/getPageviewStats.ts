@@ -14,7 +14,7 @@ export async function getPageviewStats(...args: [websiteId: string, filters: Que
 async function relationalQuery(websiteId: string, filters: QueryFilters) {
   const { timezone = 'utc', unit = 'day' } = filters;
   const { getDateQuery, parseFilters, rawQuery } = prisma;
-  const { filterQuery, joinSession, params } = await parseFilters(websiteId, {
+  const { filterQuery, joinVisitor, params } = await parseFilters(websiteId, {
     ...filters,
     eventType: EVENT_TYPE.pageView,
   });
@@ -25,7 +25,7 @@ async function relationalQuery(websiteId: string, filters: QueryFilters) {
       ${getDateQuery('website_event.created_at', unit, timezone)} x,
       count(*) y
     from website_event
-      ${joinSession}
+      ${joinVisitor}
     where website_event.website_id = {{websiteId::uuid}}
       and website_event.created_at between {{startDate}} and {{endDate}}
       and event_type = {{eventType}}

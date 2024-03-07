@@ -1,10 +1,10 @@
 import prisma from 'lib/prisma';
 import clickhouse from 'lib/clickhouse';
 import { runQuery, CLICKHOUSE, PRISMA } from 'lib/db';
-import { EVENT_TYPE, SESSION_COLUMNS } from 'lib/constants';
+import { EVENT_TYPE, VISITOR_COLUMNS } from 'lib/constants';
 import { QueryFilters } from 'lib/types';
 
-export async function getSessionMetrics(
+export async function getVisitorMetrics(
   ...args: [
     websiteId: string,
     column: string,
@@ -27,14 +27,14 @@ async function relationalQuery(
   offset: number = 0,
 ) {
   const { parseFilters, rawQuery } = prisma;
-  const { filterQuery, joinSession, params } = await parseFilters(
+  const { filterQuery, joinVisitor, params } = await parseFilters(
     websiteId,
     {
       ...filters,
       eventType: EVENT_TYPE.pageView,
     },
     {
-      joinSession: SESSION_COLUMNS.includes(column),
+      joinVisitor: VISITOR_COLUMNS.includes(column),
     },
   );
   const includeCountry = column === 'city' || column === 'subdivision1';
@@ -43,10 +43,10 @@ async function relationalQuery(
     `
     select 
       ${column} x,
-      count(distinct website_event.session_id) y
+      count(distinct website_event.visitor_id) y
       ${includeCountry ? ', country' : ''}
     from website_event
-    ${joinSession}
+    ${joinVisitor}
     where website_event.website_id = {{websiteId::uuid}}
       and website_event.created_at between {{startDate}} and {{endDate}}
       and website_event.event_type = {{eventType}}
@@ -79,7 +79,7 @@ async function clickhouseQuery(
     `
     select
       ${column} x,
-      count(distinct session_id) y
+      count(distinct visitor_id) y
       ${includeCountry ? ', country' : ''}
     from website_event
     where website_id = {websiteId:UUID}

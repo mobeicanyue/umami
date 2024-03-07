@@ -72,10 +72,10 @@ async function relationalQuery(
         if (levelNumber >= 2) {
           pv.levelQuery += `
           , level${levelNumber} AS (
-            select distinct we.session_id, we.created_at
+            select distinct we.visitor_id, we.created_at
             from level${i} l
             join website_event we
-                on l.session_id = we.session_id
+                on l.visitor_id = we.visitor_id
             where we.website_id = {{websiteId::uuid}}
                 and we.created_at between l.created_at and ${getAddIntervalQuery(
                   `l.created_at `,
@@ -87,7 +87,7 @@ async function relationalQuery(
           )`;
         }
 
-        pv.sumQuery += `\n${startSum}select ${levelNumber} as level, count(distinct(session_id)) as count from level${levelNumber}`;
+        pv.sumQuery += `\n${startSum}select ${levelNumber} as level, count(distinct(visitor_id)) as count from level${levelNumber}`;
 
         return pv;
       },
@@ -101,7 +101,7 @@ async function relationalQuery(
   return rawQuery(
     `
     WITH level1 AS (
-      select distinct session_id, created_at
+      select distinct visitor_id, created_at
       from website_event
       where website_id = {{websiteId::uuid}}
         and created_at between {{startDate}} and {{endDate}}
@@ -157,20 +157,20 @@ async function clickhouseQuery(
         if (levelNumber >= 2) {
           pv.levelQuery += `\n
           , level${levelNumber} AS (
-            select distinct y.session_id as session_id,
+            select distinct y.visitor_id as visitor_id,
                 y.url_path as url_path,
                 y.referrer_path as referrer_path,
                 y.created_at as created_at
             from level${i} x
             join level0 y
-            on x.session_id = y.session_id
+            on x.visitor_id = y.visitor_id
             where y.created_at between x.created_at and x.created_at + interval ${windowMinutes} minute
                 and y.referrer_path = {url${i - 1}:String}
                 and y.url_path = {url${i}:String}
           )`;
         }
 
-        pv.sumQuery += `\n${startSum}select ${levelNumber} as level, count(distinct(session_id)) as count from level${levelNumber}`;
+        pv.sumQuery += `\n${startSum}select ${levelNumber} as level, count(distinct(visitor_id)) as count from level${levelNumber}`;
         pv.urlFilterQuery += `${startFilter}{url${i}:String} `;
         pv.urlParams[`url${i}`] = cv;
 
@@ -188,7 +188,7 @@ async function clickhouseQuery(
   return rawQuery(
     `
     WITH level0 AS (
-      select distinct session_id, url_path, referrer_path, created_at
+      select distinct visitor_id, url_path, referrer_path, created_at
       from umami.website_event
       where url_path in (${urlFilterQuery})
         and website_id = {websiteId:UUID}

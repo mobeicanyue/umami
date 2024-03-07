@@ -4,7 +4,7 @@ import prisma from 'lib/prisma';
 import { EVENT_TYPE } from 'lib/constants';
 import { QueryFilters } from 'lib/types';
 
-export async function getSessionStats(...args: [websiteId: string, filters: QueryFilters]) {
+export async function getVisitorStats(...args: [websiteId: string, filters: QueryFilters]) {
   return runQuery({
     [PRISMA]: () => relationalQuery(...args),
     [CLICKHOUSE]: () => clickhouseQuery(...args),
@@ -14,7 +14,7 @@ export async function getSessionStats(...args: [websiteId: string, filters: Quer
 async function relationalQuery(websiteId: string, filters: QueryFilters) {
   const { timezone = 'utc', unit = 'day' } = filters;
   const { getDateQuery, parseFilters, rawQuery } = prisma;
-  const { filterQuery, joinSession, params } = await parseFilters(websiteId, {
+  const { filterQuery, joinVisitor, params } = await parseFilters(websiteId, {
     ...filters,
     eventType: EVENT_TYPE.pageView,
   });
@@ -23,9 +23,9 @@ async function relationalQuery(websiteId: string, filters: QueryFilters) {
     `
     select
       ${getDateQuery('website_event.created_at', unit, timezone)} x,
-      count(distinct website_event.session_id) y
+      count(distinct website_event.visitor_id) y
     from website_event
-      ${joinSession}
+      ${joinVisitor}
     where website_event.website_id = {{websiteId::uuid}}
       and website_event.created_at between {{startDate}} and {{endDate}}
       and event_type = {{eventType}}
@@ -55,7 +55,7 @@ async function clickhouseQuery(
     from (
       select 
         ${getDateQuery('created_at', unit, timezone)} as t,
-        count(distinct session_id) as y
+        count(distinct visitor_id) as y
       from website_event
       where website_id = {websiteId:UUID}
         and created_at between {startDate:DateTime64} and {endDate:DateTime64}

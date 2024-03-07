@@ -9,7 +9,7 @@
     "label.laptop",
     "label.tablet",
     "label.name",
-    "label.sessions",
+    "label.visitors",
     "label.team",
     "label.team-id",
     "label.teams"
@@ -23,7 +23,7 @@
     "label.laptop",
     "label.tablet",
     "label.name",
-    "label.sessions",
+    "label.visitors",
     "label.team",
     "label.team-id",
     "label.teams"

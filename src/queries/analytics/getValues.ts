@@ -18,8 +18,8 @@ async function relationalQuery(websiteId: string, column: string, startDate: Dat
     `
     select distinct ${column} as "value"
     from website_event
-    inner join session
-      on session.session_id = website_event.session_id
+    inner join visitor
+      on visitor.visitor_id = website_event.visitor_id
     where website_event.website_id = {{websiteId::uuid}}
       and website_event.created_at between {{startDate}} and {{endDate}}
     limit 500

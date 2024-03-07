@@ -927,10 +927,10 @@
       "value": "Choisir un site"
     }
   ],
-  "label.sessions": [
+  "label.visitors": [
     {
       "type": 0,
-      "value": "Sessions"
+      "value": "Visitors"
     }
   ],
   "label.settings": [

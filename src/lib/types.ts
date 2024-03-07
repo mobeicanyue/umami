@@ -160,7 +160,7 @@ export interface WebsitePageviews {
     t: string;
     y: number;
   };
-  sessions: {
+  visitors: {
     t: string;
     y: number;
   };
@@ -181,7 +181,7 @@ export interface RealtimeInit {
 
 export interface RealtimeUpdate {
   pageviews: any[];
-  sessions: any[];
+  visitors: any[];
   events: any[];
   timestamp: number;
 }
@@ -217,16 +217,16 @@ export interface QueryFilters {
 }
 
 export interface QueryOptions {
-  joinSession?: boolean;
+  joinVisitor?: boolean;
   columns?: { [key: string]: string };
   limit?: number;
 }
 
 export interface RealtimeData {
   pageviews: any[];
-  sessions: any[];
+  visitors: any[];
   events: any[];
   timestamp: number;
   countries?: any[];
-  visitors?: any[];
+  currentVisitors?: any[];
 }

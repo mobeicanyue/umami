@@ -1,10 +1,10 @@
-import { getSessions, getEvents } from 'queries/index';
+import { getVisitors, getEvents } from 'queries/index';
 import { EVENT_TYPE } from 'lib/constants';
 
 export async function getRealtimeData(websiteId: string, startDate: Date) {
-  const [pageviews, sessions, events] = await Promise.all([
+  const [pageviews, visitors, events] = await Promise.all([
     getEvents(websiteId, startDate, EVENT_TYPE.pageView),
-    getSessions(websiteId, startDate),
+    getVisitors(websiteId, startDate),
     getEvents(websiteId, startDate, EVENT_TYPE.customEvent),
   ]);
 
@@ -36,7 +36,7 @@ export async function getRealtimeData(websiteId: string, startDate: Date) {
 
   return {
     pageviews: decorate('pageview', pageviews),
-    sessions: uniques('session', sessions),
+    visitors: uniques('visitor', visitors),
     events: decorate('event', events),
     timestamp: Date.now(),
   };

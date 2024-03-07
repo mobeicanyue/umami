@@ -33,7 +33,7 @@ export const FILTER_PAGES = 'filter-pages';
 export const UNIT_TYPES = ['year', 'month', 'hour', 'day'];
 export const EVENT_COLUMNS = ['url', 'referrer', 'title', 'query', 'event'];
 
-export const SESSION_COLUMNS = [
+export const VISITOR_COLUMNS = [
   'browser',
   'os',
   'device',

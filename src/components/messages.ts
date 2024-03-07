@@ -117,7 +117,6 @@ export const labels = defineMessages({
   selectRole: { id: 'label.select-role', defaultMessage: 'Select role' },
   selectDate: { id: 'label.select-date', defaultMessage: 'Select date' },
   all: { id: 'label.all', defaultMessage: 'All' },
-  sessions: { id: 'label.sessions', defaultMessage: 'Sessions' },
   pageNotFound: { id: 'message.page-not-found', defaultMessage: 'Page not found' },
   activityLog: { id: 'label.activity-log', defaultMessage: 'Activity log' },
   dismiss: { id: 'label.dismiss', defaultMessage: 'Dismiss' },

@@ -3,11 +3,11 @@ import { isbot } from 'isbot';
 import { COLLECTION_TYPE, HOSTNAME_REGEX, IP_REGEX } from 'lib/constants';
 import { secret } from 'lib/crypto';
 import { getIpAddress } from 'lib/detect';
-import { useCors, useSession, useValidate } from 'lib/middleware';
+import { useCors, useVisitor, useValidate } from 'lib/middleware';
 import { CollectionType, YupRequest } from 'lib/types';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { badRequest, createToken, forbidden, methodNotAllowed, ok, send } from 'next-basics';
-import { saveEvent, saveSessionData } from 'queries';
+import { saveEvent, saveVisitorData } from 'queries';
 import * as yup from 'yup';
 
 export interface CollectRequestBody {
@@ -28,7 +28,7 @@ export interface CollectRequestBody {
 
 export interface NextApiRequestCollect extends NextApiRequest {
   body: CollectRequestBody;
-  session: {
+  visitor: {
     id: string;
     websiteId: string;
     ownerId: string;
@@ -89,9 +89,9 @@ export default async (req: NextApiRequestCollect, res: NextApiResponse) => {
 
     const { url, referrer, name: eventName, data: eventData, title: pageTitle } = payload;
 
-    await useSession(req, res);
+    await useVisitor(req, res);
 
-    const session = req.session;
+    const visitor = req.visitor;
 
     if (type === COLLECTION_TYPE.event) {
       // eslint-disable-next-line prefer-const
@@ -123,8 +123,8 @@ export default async (req: NextApiRequestCollect, res: NextApiResponse) => {
         pageTitle,
         eventName,
         eventData,
-        ...session,
-        sessionId: session.id,
+        ...visitor,
+        visitorId: visitor.id,
       });
     }
 
@@ -133,14 +133,14 @@ export default async (req: NextApiRequestCollect, res: NextApiResponse) => {
         return badRequest(res, 'Data required.');
       }
 
-      await saveSessionData({
-        websiteId: session.websiteId,
-        sessionId: session.id,
-        sessionData: eventData,
+      await saveVisitorData({
+        websiteId: visitor.websiteId,
+        visitorId: visitor.id,
+        visitorData: eventData,
       });
     }
 
-    const token = createToken(session, secret());
+    const token = createToken(visitor, secret());
 
     return send(res, token);
   }

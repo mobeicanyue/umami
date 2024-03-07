@@ -1,6 +1,6 @@
 import { User, Website } from '@prisma/client';
 import redis from '@umami/redis-client';
-import { getSession, getUser, getWebsite } from '../queries';
+import { getVisitor, getUser, getWebsite } from '../queries';
 
 async function fetchWebsite(websiteId: string): Promise<Website> {
   return redis.client.getCache(`website:${websiteId}`, () => getWebsite(websiteId), 86400);
@@ -38,13 +38,13 @@ async function deleteUser(id) {
   return redis.client.deleteCache(`user:${id}`);
 }
 
-async function fetchSession(id) {
-  return redis.client.getCache(`session:${id}`, () => getSession(id), 86400);
+async function fetchVisitor(id) {
+  return redis.client.getCache(`visitor:${id}`, () => getVisitor(id), 86400);
 }
 
-async function storeSession(data) {
+async function storeVisitor(data) {
   const { id } = data;
-  const key = `session:${id}`;
+  const key = `visitor:${id}`;
 
   const obj = await redis.client.setCache(key, data);
   await redis.client.expire(key, 86400);
@@ -52,8 +52,8 @@ async function storeSession(data) {
   return obj;
 }
 
-async function deleteSession(id) {
-  return redis.client.deleteCache(`session:${id}`);
+async function deleteVisitor(id) {
+  return redis.client.deleteCache(`visitor:${id}`);
 }
 
 async function fetchUserBlock(userId: string) {
@@ -73,9 +73,9 @@ export default {
   fetchUser,
   storeUser,
   deleteUser,
-  fetchSession,
-  storeSession,
-  deleteSession,
+  fetchVisitor,
+  storeVisitor,
+  deleteVisitor,
   fetchUserBlock,
   incrementUserBlock,
   enabled: !!redis.enabled,

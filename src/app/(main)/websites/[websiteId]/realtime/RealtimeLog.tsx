@@ -1,26 +1,26 @@
-import { useMemo, useState } from 'react';
-import { StatusLight, Icon, Text, SearchField } from 'react-basics';
-import { FixedSizeList } from 'react-window';
-import { format } from 'date-fns';
-import thenby from 'thenby';
-import { safeDecodeURI } from 'next-basics';
-import FilterButtons from 'components/common/FilterButtons';
-import Empty from 'components/common/Empty';
-import { useLocale, useCountryNames, useMessages } from 'components/hooks';
-import Icons from 'components/icons';
 import useFormat from 'components//hooks/useFormat';
+import Empty from 'components/common/Empty';
+import FilterButtons from 'components/common/FilterButtons';
+import { useCountryNames, useLocale, useMessages } from 'components/hooks';
+import Icons from 'components/icons';
+import { format } from 'date-fns';
 import { BROWSERS } from 'lib/constants';
 import { stringToColor } from 'lib/format';
+import { safeDecodeURI } from 'next-basics';
+import { useMemo, useState } from 'react';
+import { Icon, SearchField, StatusLight, Text } from 'react-basics';
+import { FixedSizeList } from 'react-window';
+import thenby from 'thenby';
 import styles from './RealtimeLog.module.css';
 
 const TYPE_ALL = 'all';
 const TYPE_PAGEVIEW = 'pageview';
-const TYPE_SESSION = 'session';
+const TYPE_VISITOR = 'visitor';
 const TYPE_EVENT = 'event';
 
 const icons = {
   [TYPE_PAGEVIEW]: <Icons.Eye />,
-  [TYPE_SESSION]: <Icons.Visitor />,
+  [TYPE_VISITOR]: <Icons.Visitor />,
   [TYPE_EVENT]: <Icons.Bolt />,
 };
 
@@ -43,7 +43,7 @@ export function RealtimeLog({ data, websiteDomain }) {
     },
     {
       label: formatMessage(labels.visitors),
-      key: TYPE_SESSION,
+      key: TYPE_VISITOR,
     },
     {
       label: formatMessage(labels.events),
@@ -53,7 +53,7 @@ export function RealtimeLog({ data, websiteDomain }) {
 
   const getTime = ({ timestamp }) => format(timestamp, 'h:mm:ss');
 
-  const getColor = ({ id, sessionId }) => stringToColor(sessionId || id);
+  const getColor = ({ id, visitorId }) => stringToColor(visitorId || id);
 
   const getIcon = ({ __type }) => icons[__type];
 
@@ -102,7 +102,7 @@ export function RealtimeLog({ data, websiteDomain }) {
       );
     }
 
-    if (__type === TYPE_SESSION) {
+    if (__type === TYPE_VISITOR) {
       return (
         <FormattedMessage
           {...messages.visitorLog}

@@ -27,8 +27,8 @@ model User {
   @@map("user")
 }
 
-model Session {
-  id           String    @id @unique @map("session_id") @db.VarChar(36)
+model Visitor {
+  id           String    @id @unique @map("visitor_id") @db.VarChar(36)
   websiteId    String    @map("website_id") @db.VarChar(36)
   hostname     String?   @db.VarChar(100)
   browser      String?   @db.VarChar(20)
@@ -43,7 +43,7 @@ model Session {
   createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
 
   websiteEvent WebsiteEvent[]
-  sessionData  SessionData[]
+  visitorData  VisitorData[]
 
   @@index([createdAt])
   @@index([websiteId])
@@ -57,7 +57,7 @@ model Session {
   @@index([websiteId, createdAt, country])
   @@index([websiteId, createdAt, subdivision1])
   @@index([websiteId, createdAt, city])
-  @@map("session")
+  @@map("visitor")
 }
 
 model Website {
@@ -78,7 +78,7 @@ model Website {
   team        Team?         @relation(fields: [teamId], references: [id])
   eventData   EventData[]
   report      Report[]
-  sessionData SessionData[]
+  visitorData VisitorData[]
 
   @@index([userId])
   @@index([teamId])
@@ -91,6 +91,7 @@ model Website {
 model WebsiteEvent {
   id             String    @id() @map("event_id") @db.VarChar(36)
   websiteId      String    @map("website_id") @db.VarChar(36)
+  visitorId      String    @map("visitor_id") @db.VarChar(36)
   sessionId      String    @map("session_id") @db.VarChar(36)
   createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
   urlPath        String    @map("url_path") @db.VarChar(500)
@@ -103,10 +104,10 @@ model WebsiteEvent {
   eventName      String?   @map("event_name") @db.VarChar(50)
 
   eventData EventData[]
-  session   Session     @relation(fields: [sessionId], references: [id])
+  visitor   Visitor     @relation(fields: [visitorId], references: [id])
 
   @@index([createdAt])
-  @@index([sessionId])
+  @@index([visitorId])
   @@index([websiteId])
   @@index([websiteId, createdAt])
   @@index([websiteId, createdAt, urlPath])
@@ -114,7 +115,7 @@ model WebsiteEvent {
   @@index([websiteId, createdAt, referrerDomain])
   @@index([websiteId, createdAt, pageTitle])
   @@index([websiteId, createdAt, eventName])
-  @@index([websiteId, sessionId, createdAt])
+  @@index([websiteId, visitorId, createdAt])
   @@map("website_event")
 }
 
@@ -141,10 +142,10 @@ model EventData {
   @@map("event_data")
 }
 
-model SessionData {
-  id          String    @id() @map("session_data_id") @db.VarChar(36)
+model VisitorData {
+  id          String    @id() @map("visitor_data_id") @db.VarChar(36)
   websiteId   String    @map("website_id") @db.VarChar(36)
-  sessionId   String    @map("session_id") @db.VarChar(36)
+  visitorId   String    @map("visitor_id") @db.VarChar(36)
   eventKey    String    @map("event_key") @db.VarChar(500)
   stringValue String?   @map("string_value") @db.VarChar(500)
   numberValue Decimal?  @map("number_value") @db.Decimal(19, 4)
@@ -153,12 +154,12 @@ model SessionData {
   createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
 
   website Website @relation(fields: [websiteId], references: [id])
-  session Session @relation(fields: [sessionId], references: [id])
+  visitor Visitor @relation(fields: [visitorId], references: [id])
 
   @@index([createdAt])
   @@index([websiteId])
-  @@index([sessionId])
-  @@map("session_data")
+  @@index([visitorId])
+  @@map("visitor_data")
 }
 
 model Team {

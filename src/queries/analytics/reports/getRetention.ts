@@ -41,22 +41,22 @@ async function relationalQuery(
   return rawQuery(
     `
     WITH cohort_items AS (
-      select session_id,
+      select visitor_id,
         ${getDateQuery('created_at', unit, timezone)} as cohort_date  
-      from session 
+      from visitor 
       where website_id = {{websiteId::uuid}}
         and created_at between {{startDate}} and {{endDate}}
     ),
     user_activities AS (
       select distinct
-        w.session_id,
+        w.visitor_id,
         ${getDayDiffQuery(
           getDateQuery('created_at', unit, timezone),
           'c.cohort_date',
         )} as day_number
       from website_event w
       join cohort_items c
-      on w.session_id = c.session_id
+      on w.visitor_id = c.visitor_id
       where website_id = {{websiteId::uuid}}
           and created_at between {{startDate}} and {{endDate}}
       ),
@@ -74,7 +74,7 @@ async function relationalQuery(
         count(*) as visitors
       from user_activities a
       join cohort_items c
-      on a.session_id = c.session_id
+      on a.visitor_id = c.visitor_id
       group by 1, 2
     )
     select
@@ -123,19 +123,19 @@ async function clickhouseQuery(
     WITH cohort_items AS (
       select
         min(${getDateQuery('created_at', unit, timezone)}) as cohort_date,
-        session_id
+        visitor_id
       from website_event
       where website_id = {websiteId:UUID}
       and created_at between {startDate:DateTime64} and {endDate:DateTime64}
-      group by session_id
+      group by visitor_id
     ),
     user_activities AS (
       select distinct
-        w.session_id,
+        w.visitor_id,
         (${getDateQuery('created_at', unit, timezone)} - c.cohort_date) / 86400 as day_number
       from website_event w
       join cohort_items c
-      on w.session_id = c.session_id
+      on w.visitor_id = c.visitor_id
       where website_id = {websiteId:UUID}
         and created_at between {startDate:DateTime64} and {endDate:DateTime64}
     ),
@@ -153,7 +153,7 @@ async function clickhouseQuery(
         count(*) as visitors
       from user_activities a
       join cohort_items c
-      on a.session_id = c.session_id
+      on a.visitor_id = c.visitor_id
       group by 1, 2
     )
     select

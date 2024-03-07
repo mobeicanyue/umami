@@ -2,9 +2,10 @@
 CREATE TABLE umami.website_event
 (
     website_id UUID,
+    visitor_id UUID,
     session_id UUID,
     event_id UUID,
-    --sessions
+    --visitors
     hostname LowCardinality(String),
     browser LowCardinality(String),
     os LowCardinality(String),
@@ -29,12 +30,13 @@ CREATE TABLE umami.website_event
     job_id UUID
 )
     engine = MergeTree
-        ORDER BY (website_id, session_id, created_at)
+        ORDER BY (website_id, visitor_id, session_id, created_at)
         SETTINGS index_granularity = 8192;
 
 CREATE TABLE umami.event_data
 (
     website_id UUID,
+    visitor_id UUID,
     session_id UUID,
     event_id UUID,
     url_path String,

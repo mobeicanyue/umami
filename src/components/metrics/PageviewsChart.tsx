@@ -5,7 +5,7 @@ import { renderDateLabels, renderStatusTooltipPopup } from 'lib/charts';
 
 export interface PageviewsChartProps extends BarChartProps {
   data: {
-    sessions: any[];
+    visitors: any[];
     pageviews: any[];
   };
   unit: string;
@@ -23,7 +23,7 @@ export function PageviewsChart({ data, unit, isLoading, ...props }: PageviewsCha
     return [
       {
         label: formatMessage(labels.visitors),
-        data: data.sessions,
+        data: data.visitors,
         borderWidth: 1,
         ...colors.chart.visitors,
       },

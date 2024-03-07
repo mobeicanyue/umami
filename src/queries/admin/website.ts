@@ -139,7 +139,7 @@ export async function resetWebsite(
     client.websiteEvent.deleteMany({
       where: { websiteId },
     }),
-    client.session.deleteMany({
+    client.visitor.deleteMany({
       where: { websiteId },
     }),
     client.website.update({
@@ -170,7 +170,7 @@ export async function deleteWebsite(
     client.websiteEvent.deleteMany({
       where: { websiteId },
     }),
-    client.session.deleteMany({
+    client.visitor.deleteMany({
       where: { websiteId },
     }),
     client.report.deleteMany({

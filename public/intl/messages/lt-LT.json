@@ -1040,10 +1040,10 @@
       "value": "Select website"
     }
   ],
-  "label.sessions": [
+  "label.visitors": [
     {
       "type": 0,
-      "value": "Sessions"
+      "value": "Visitors"
     }
   ],
   "label.settings": [

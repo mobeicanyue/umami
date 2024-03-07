@@ -4,7 +4,7 @@ import { parseDateRangeQuery } from 'lib/query';
 import { NextApiRequestQueryBody, WebsitePageviews } from 'lib/types';
 import { NextApiResponse } from 'next';
 import { methodNotAllowed, ok, unauthorized } from 'next-basics';
-import { getPageviewStats, getSessionStats } from 'queries';
+import { getPageviewStats, getVisitorStats } from 'queries';
 
 export interface WebsitePageviewRequestQuery {
   websiteId: string;
@@ -78,12 +78,12 @@ export default async (
       city,
     };
 
-    const [pageviews, sessions] = await Promise.all([
+    const [pageviews, visitors] = await Promise.all([
       getPageviewStats(websiteId, filters),
-      getSessionStats(websiteId, filters),
+      getVisitorStats(websiteId, filters),
     ]);
 
-    return ok(res, { pageviews, sessions });
+    return ok(res, { pageviews, visitors });
   }
 
   return methodNotAllowed(res);

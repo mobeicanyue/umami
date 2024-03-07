@@ -3,7 +3,7 @@ import { canViewWebsite } from 'lib/auth';
 import { useAuth, useCors, useValidate } from 'lib/middleware';
 import { NextApiResponse } from 'next';
 import { badRequest, methodNotAllowed, ok, unauthorized } from 'next-basics';
-import { EVENT_COLUMNS, FILTER_COLUMNS, SESSION_COLUMNS } from 'lib/constants';
+import { EVENT_COLUMNS, FILTER_COLUMNS, VISITOR_COLUMNS } from 'lib/constants';
 import { getValues } from 'queries';
 import { parseDateRangeQuery } from 'lib/query';
 
@@ -31,7 +31,7 @@ export default async (req: NextApiRequestQueryBody<ValuesRequestQuery>, res: Nex
   const { startDate, endDate } = await parseDateRangeQuery(req);
 
   if (req.method === 'GET') {
-    if (!SESSION_COLUMNS.includes(type as string) && !EVENT_COLUMNS.includes(type as string)) {
+    if (!VISITOR_COLUMNS.includes(type as string) && !EVENT_COLUMNS.includes(type as string)) {
       return badRequest(res);
     }
 

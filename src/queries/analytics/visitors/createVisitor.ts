@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client';
 import cache from 'lib/cache';
 import prisma from 'lib/prisma';
 
-export async function createSession(data: Prisma.SessionCreateInput) {
+export async function createVisitor(data: Prisma.VisitorCreateInput) {
   const {
     id,
     websiteId,
@@ -18,7 +18,7 @@ export async function createSession(data: Prisma.SessionCreateInput) {
     city,
   } = data;
 
-  return prisma.client.session
+  return prisma.client.visitor
     .create({
       data: {
         id,
@@ -37,7 +37,7 @@ export async function createSession(data: Prisma.SessionCreateInput) {
     })
     .then(async data => {
       if (cache.enabled) {
-        await cache.storeSession(data);
+        await cache.storeVisitor(data);
       }
 
       return data;

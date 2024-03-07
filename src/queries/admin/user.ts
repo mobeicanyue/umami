@@ -175,7 +175,7 @@ export async function deleteUser(
     client.websiteEvent.deleteMany({
       where: { websiteId: { in: websiteIds } },
     }),
-    client.session.deleteMany({
+    client.visitor.deleteMany({
       where: { websiteId: { in: websiteIds } },
     }),
     client.teamUser.deleteMany({

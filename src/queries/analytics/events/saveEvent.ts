@@ -6,7 +6,7 @@ import { uuid } from 'lib/crypto';
 import { saveEventData } from 'queries/analytics/eventData/saveEventData';
 
 export async function saveEvent(args: {
-  sessionId: string;
+  visitorId: string;
   websiteId: string;
   urlPath: string;
   urlQuery?: string;
@@ -34,7 +34,7 @@ export async function saveEvent(args: {
 }
 
 async function relationalQuery(data: {
-  sessionId: string;
+  visitorId: string;
   websiteId: string;
   urlPath: string;
   urlQuery?: string;
@@ -47,7 +47,7 @@ async function relationalQuery(data: {
 }) {
   const {
     websiteId,
-    sessionId,
+    visitorId,
     urlPath,
     urlQuery,
     referrerPath,
@@ -63,7 +63,7 @@ async function relationalQuery(data: {
     data: {
       id: websiteEventId,
       websiteId,
-      sessionId,
+      visitorId,
       urlPath: urlPath?.substring(0, URL_LENGTH),
       urlQuery: urlQuery?.substring(0, URL_LENGTH),
       referrerPath: referrerPath?.substring(0, URL_LENGTH),
@@ -78,7 +78,7 @@ async function relationalQuery(data: {
   if (eventData) {
     await saveEventData({
       websiteId,
-      sessionId,
+      visitorId,
       eventId: websiteEventId,
       urlPath: urlPath?.substring(0, URL_LENGTH),
       eventName: eventName?.substring(0, EVENT_NAME_LENGTH),
@@ -90,7 +90,7 @@ async function relationalQuery(data: {
 }
 
 async function clickhouseQuery(data: {
-  sessionId: string;
+  visitorId: string;
   websiteId: string;
   urlPath: string;
   urlQuery?: string;
@@ -113,7 +113,7 @@ async function clickhouseQuery(data: {
 }) {
   const {
     websiteId,
-    sessionId,
+    visitorId,
     urlPath,
     urlQuery,
     referrerPath,
@@ -135,7 +135,7 @@ async function clickhouseQuery(data: {
   const message = {
     ...args,
     website_id: websiteId,
-    session_id: sessionId,
+    visitor_id: visitorId,
     event_id: uuid(),
     country: country,
     subdivision1:
@@ -162,7 +162,7 @@ async function clickhouseQuery(data: {
   if (eventData) {
     await saveEventData({
       websiteId,
-      sessionId,
+      visitorId,
       eventId,
       urlPath: urlPath?.substring(0, URL_LENGTH),
       eventName: eventName?.substring(0, EVENT_NAME_LENGTH),

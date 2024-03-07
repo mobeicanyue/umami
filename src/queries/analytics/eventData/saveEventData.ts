@@ -10,7 +10,7 @@ import { DynamicData } from 'lib/types';
 export async function saveEventData(args: {
   websiteId: string;
   eventId: string;
-  sessionId?: string;
+  visitorId?: string;
   urlPath?: string;
   eventName?: string;
   eventData: DynamicData;
@@ -51,13 +51,13 @@ async function relationalQuery(data: {
 async function clickhouseQuery(data: {
   websiteId: string;
   eventId: string;
-  sessionId?: string;
+  visitorId?: string;
   urlPath?: string;
   eventName?: string;
   eventData: DynamicData;
   createdAt?: string;
 }) {
-  const { websiteId, sessionId, eventId, urlPath, eventName, eventData, createdAt } = data;
+  const { websiteId, visitorId, eventId, urlPath, eventName, eventData, createdAt } = data;
 
   const { getDateFormat, sendMessages } = kafka;
 
@@ -65,7 +65,7 @@ async function clickhouseQuery(data: {
 
   const messages = jsonKeys.map(a => ({
     website_id: websiteId,
-    session_id: sessionId,
+    visitor_id: visitorId,
     event_id: eventId,
     url_path: urlPath,
     event_name: eventName,

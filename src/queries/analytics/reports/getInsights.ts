@@ -1,7 +1,7 @@
 import { CLICKHOUSE, PRISMA, runQuery } from 'lib/db';
 import prisma from 'lib/prisma';
 import clickhouse from 'lib/clickhouse';
-import { EVENT_TYPE, FILTER_COLUMNS, SESSION_COLUMNS } from 'lib/constants';
+import { EVENT_TYPE, FILTER_COLUMNS, VISITOR_COLUMNS } from 'lib/constants';
 import { QueryFilters } from 'lib/types';
 
 export async function getInsights(
@@ -24,14 +24,14 @@ async function relationalQuery(
   }[]
 > {
   const { parseFilters, rawQuery } = prisma;
-  const { filterQuery, joinSession, params } = await parseFilters(
+  const { filterQuery, joinVisitor, params } = await parseFilters(
     websiteId,
     {
       ...filters,
       eventType: EVENT_TYPE.pageView,
     },
     {
-      joinSession: !!fields.find(({ name }) => SESSION_COLUMNS.includes(name)),
+      joinVisitor: !!fields.find(({ name }) => VISITOR_COLUMNS.includes(name)),
     },
   );
 
@@ -40,7 +40,7 @@ async function relationalQuery(
     select 
       ${parseFields(fields)}
     from website_event
-      ${joinSession}
+      ${joinVisitor}
     where website_event.website_id = {{websiteId::uuid}}
       and website_event.created_at between {{startDate}} and {{endDate}}
       and website_event.event_type = {{eventType}}
@@ -101,7 +101,7 @@ function parseFields(fields: any[]) {
 
       return arr.concat(`${FILTER_COLUMNS[name]} as "${name}"`);
     },
-    ['count(*) as views', 'count(distinct website_event.session_id) as visitors'],
+    ['count(*) as views', 'count(distinct website_event.visitor_id) as visitors'],
   );
 
   return query.join(',\n');

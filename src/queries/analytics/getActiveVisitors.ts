@@ -15,7 +15,7 @@ async function relationalQuery(websiteId: string) {
 
   const result = await rawQuery(
     `
-    select count(distinct session_id) x
+    select count(distinct visitor_id) x
     from website_event
     where website_id = {{websiteId::uuid}}
     and created_at >= {{startAt}}
@@ -32,7 +32,7 @@ async function clickhouseQuery(websiteId: string): Promise<{ x: number }> {
   const result = await rawQuery(
     `
     select
-      count(distinct session_id) x
+      count(distinct visitor_id) x
     from website_event
     where website_id = {websiteId:UUID}
       and created_at >= {startAt:DateTime64}

@@ -2,7 +2,7 @@ import prisma from 'lib/prisma';
 import clickhouse from 'lib/clickhouse';
 import { runQuery, PRISMA, CLICKHOUSE } from 'lib/db';
 
-export async function getSessions(...args: [websiteId: string, startAt: Date]) {
+export async function getVisitors(...args: [websiteId: string, startAt: Date]) {
   return runQuery({
     [PRISMA]: () => relationalQuery(...args),
     [CLICKHOUSE]: () => clickhouseQuery(...args),
@@ -10,7 +10,7 @@ export async function getSessions(...args: [websiteId: string, startAt: Date]) {
 }
 
 async function relationalQuery(websiteId: string, startDate: Date) {
-  return prisma.client.session.findMany({
+  return prisma.client.visitor.findMany({
     where: {
       websiteId,
       createdAt: {
@@ -29,7 +29,7 @@ async function clickhouseQuery(websiteId: string, startDate: Date) {
   return rawQuery(
     `
     select
-      session_id as id,
+      visitor_id as id,
       website_id as websiteId,
       created_at as createdAt,
       toUnixTimestamp(created_at) as timestamp,

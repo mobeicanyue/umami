@@ -2,12 +2,12 @@ import { isUuid, secret, uuid } from 'lib/crypto';
 import { getClientInfo } from 'lib/detect';
 import { parseToken } from 'next-basics';
 import { NextApiRequestCollect } from 'pages/api/send';
-import { createSession } from 'queries';
+import { createVisitor } from 'queries';
 import cache from './cache';
 import clickhouse from './clickhouse';
-import { loadSession, loadWebsite } from './load';
+import { loadVisitor, loadWebsite } from './load';
 
-export async function findSession(req: NextApiRequestCollect): Promise<{
+export async function findVisitor(req: NextApiRequestCollect): Promise<{
   id: any;
   websiteId: string;
   hostname: string;
@@ -66,12 +66,12 @@ export async function findSession(req: NextApiRequestCollect): Promise<{
   const { userAgent, browser, os, ip, country, subdivision1, subdivision2, city, device } =
     await getClientInfo(req, payload);
 
-  const sessionId = uuid(websiteId, hostname, ip, userAgent);
+  const visitorId = uuid(websiteId, hostname, ip, userAgent);
 
-  // Clickhouse does not require session lookup
+  // Clickhouse does not require visitor lookup
   if (clickhouse.enabled) {
     return {
-      id: sessionId,
+      id: visitorId,
       websiteId,
       hostname,
       browser,
@@ -87,14 +87,14 @@ export async function findSession(req: NextApiRequestCollect): Promise<{
     };
   }
 
-  // Find session
-  let session = await loadSession(sessionId);
+  // Find visitor
+  let visitor = await loadVisitor(visitorId);
 
-  // Create a session if not found
-  if (!session) {
+  // Create a visitor if not found
+  if (!visitor) {
     try {
-      session = await createSession({
-        id: sessionId,
+      visitor = await createVisitor({
+        id: visitorId,
         websiteId,
         hostname,
         browser,
@@ -114,7 +114,7 @@ export async function findSession(req: NextApiRequestCollect): Promise<{
     }
   }
 
-  return { ...session, ownerId: website.userId };
+  return { ...visitor, ownerId: website.userId };
 }
 
 async function checkUserBlock(userId: string) {

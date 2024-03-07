@@ -16,7 +16,7 @@ export async function getEventMetrics(
 async function relationalQuery(websiteId: string, filters: QueryFilters) {
   const { timezone = 'utc', unit = 'day' } = filters;
   const { rawQuery, getDateQuery, parseFilters } = prisma;
-  const { filterQuery, joinSession, params } = await parseFilters(websiteId, {
+  const { filterQuery, joinVisitor, params } = await parseFilters(websiteId, {
     ...filters,
     eventType: EVENT_TYPE.customEvent,
   });
@@ -28,7 +28,7 @@ async function relationalQuery(websiteId: string, filters: QueryFilters) {
       ${getDateQuery('created_at', unit, timezone)} t,
       count(*) y
     from website_event
-    ${joinSession}
+    ${joinVisitor}
     where website_id = {{websiteId::uuid}}
       and created_at between {{startDate}} and {{endDate}}
       and event_type = {{eventType}}

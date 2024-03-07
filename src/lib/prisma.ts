@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client';
 import prisma from '@umami/prisma-client';
 import moment from 'moment-timezone';
 import { MYSQL, POSTGRESQL, getDatabaseType } from 'lib/db';
-import { FILTER_COLUMNS, SESSION_COLUMNS, OPERATORS, DEFAULT_PAGE_SIZE } from './constants';
+import { FILTER_COLUMNS, VISITOR_COLUMNS, OPERATORS, DEFAULT_PAGE_SIZE } from './constants';
 import { loadWebsite } from './load';
 import { maxDate } from './date';
 import { QueryFilters, QueryOptions, SearchFilter } from './types';
@@ -145,9 +145,9 @@ async function parseFilters(
   const website = await loadWebsite(websiteId);
 
   return {
-    joinSession:
-      options?.joinSession || Object.keys(filters).find(key => SESSION_COLUMNS.includes(key))
-        ? `inner join session on website_event.session_id = session.session_id`
+    joinVisitor:
+      options?.joinVisitor || Object.keys(filters).find(key => VISITOR_COLUMNS.includes(key))
+        ? `inner join visitor on website_event.visitor_id = visitor.visitor_id`
         : '',
     filterQuery: getFilterQuery(filters, options),
     params: {

@@ -32,7 +32,7 @@ function clickhouseQuery(websiteId: string, startDate: Date, eventType: number) 
     select
       event_id as id,
       website_id as websiteId, 
-      session_id as sessionId,
+      visitor_id as visitorId,
       created_at as createdAt,
       toUnixTimestamp(created_at) as timestamp,
       url_path as urlPath,

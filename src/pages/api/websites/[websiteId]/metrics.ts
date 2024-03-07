@@ -3,8 +3,8 @@ import { badRequest, methodNotAllowed, ok, unauthorized } from 'next-basics';
 import { WebsiteMetric, NextApiRequestQueryBody } from 'lib/types';
 import { canViewWebsite } from 'lib/auth';
 import { useAuth, useCors, useValidate } from 'lib/middleware';
-import { SESSION_COLUMNS, EVENT_COLUMNS, FILTER_COLUMNS } from 'lib/constants';
-import { getPageviewMetrics, getSessionMetrics } from 'queries';
+import { VISITOR_COLUMNS, EVENT_COLUMNS, FILTER_COLUMNS } from 'lib/constants';
+import { getPageviewMetrics, getVisitorMetrics } from 'queries';
 import { parseDateRangeQuery } from 'lib/query';
 import * as yup from 'yup';
 
@@ -109,8 +109,8 @@ export default async (
 
     const column = FILTER_COLUMNS[type] || type;
 
-    if (SESSION_COLUMNS.includes(type)) {
-      const data = await getSessionMetrics(
+    if (VISITOR_COLUMNS.includes(type)) {
+      const data = await getVisitorMetrics(
         websiteId,
         column,
         { ...filters, search },

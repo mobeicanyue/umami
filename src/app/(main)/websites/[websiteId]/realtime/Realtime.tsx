@@ -38,11 +38,11 @@ export function Realtime({ websiteId }) {
     if (data) {
       const date = subMinutes(startOfMinute(new Date()), REALTIME_RANGE);
       const time = date.getTime();
-      const { pageviews, sessions, events, timestamp } = data;
+      const { pageviews, visitors, events, timestamp } = data;
 
       setCurrentData(state => ({
         pageviews: mergeData(state?.pageviews, pageviews, time),
-        sessions: mergeData(state?.sessions, sessions, time),
+        visitors: mergeData(state?.visitors, visitors, time),
         events: mergeData(state?.events, events, time),
         timestamp,
       }));
@@ -51,11 +51,18 @@ export function Realtime({ websiteId }) {
 
   const realtimeData: RealtimeData = useMemo(() => {
     if (!currentData) {
-      return { pageviews: [], sessions: [], events: [], countries: [], visitors: [], timestamp: 0 };
+      return {
+        pageviews: [],
+        visitors: [],
+        events: [],
+        countries: [],
+        currentVisitors: [],
+        timestamp: 0,
+      };
     }
 
     currentData.countries = percentFilter(
-      currentData.sessions
+      currentData.visitors
         .reduce((arr, data) => {
           if (!arr.find(({ id }) => id === data.id)) {
             return arr.concat(data);
@@ -77,7 +84,7 @@ export function Realtime({ websiteId }) {
         .sort(thenby.firstBy('y', -1)),
     );
 
-    currentData.visitors = currentData.sessions.reduce((arr, val) => {
+    currentData.currentVisitors = currentData.visitors.reduce((arr, val) => {
       if (!arr.find(({ id }) => id === val.id)) {
         return arr.concat(val);
       }

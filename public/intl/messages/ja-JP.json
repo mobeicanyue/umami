@@ -935,7 +935,7 @@
       "value": "Webサイトを選択"
     }
   ],
-  "label.sessions": [
+  "label.visitors": [
     {
       "type": 0,
       "value": "セッション"

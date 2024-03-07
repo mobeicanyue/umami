@@ -13,10 +13,10 @@ export function WebsiteChart({ websiteId }: { websiteId: string }) {
     if (data) {
       return {
         pageviews: getDateArray(data.pageviews, startDate, endDate, unit),
-        sessions: getDateArray(data.sessions, startDate, endDate, unit),
+        visitors: getDateArray(data.visitors, startDate, endDate, unit),
       };
     }
-    return { pageviews: [], sessions: [] };
+    return { pageviews: [], visitors: [] };
   }, [data, startDate, endDate, unit]);
 
   return <PageviewsChart data={chartData} unit={unit} isLoading={isLoading} />;
