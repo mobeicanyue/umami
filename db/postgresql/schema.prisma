@@ -116,6 +116,7 @@ model WebsiteEvent {
   @@index([websiteId, createdAt, pageTitle])
   @@index([websiteId, createdAt, eventName])
   @@index([websiteId, visitorId, createdAt])
+  @@index([websiteId, sessionId, createdAt])
   @@map("website_event")
 }
 
