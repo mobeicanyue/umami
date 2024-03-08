@@ -16,10 +16,10 @@ function mergeData(state = [], data = [], time: number) {
 export function useRealtime(websiteId: string) {
   const currentData = useRef({
     pageviews: [],
-    sessions: [],
+    visitors: [],
     events: [],
     countries: [],
-    visitors: [],
+    currentVisitors: [],
     timestamp: 0,
   });
   const { get, useQuery } = useApi();
@@ -30,11 +30,11 @@ export function useRealtime(websiteId: string) {
       const data = await get(`/realtime/${websiteId}`, { startAt: state?.timestamp || 0 });
       const date = subMinutes(startOfMinute(new Date()), REALTIME_RANGE);
       const time = date.getTime();
-      const { pageviews, sessions, events, timestamp } = data;
+      const { pageviews, visitors, events, timestamp } = data;
 
       return {
         pageviews: mergeData(state?.pageviews, pageviews, time),
-        sessions: mergeData(state?.sessions, sessions, time),
+        visitors: mergeData(state?.visitors, visitors, time),
         events: mergeData(state?.events, events, time),
         timestamp,
       };
@@ -45,11 +45,18 @@ export function useRealtime(websiteId: string) {
 
   const realtimeData: RealtimeData = useMemo(() => {
     if (!data) {
-      return { pageviews: [], sessions: [], events: [], countries: [], visitors: [], timestamp: 0 };
+      return {
+        pageviews: [],
+        visitors: [],
+        events: [],
+        countries: [],
+        currentVisitors: [],
+        timestamp: 0,
+      };
     }
 
     data.countries = percentFilter(
-      data.sessions
+      data.visitors
         .reduce((arr, data) => {
           if (!arr.find(({ id }) => id === data.id)) {
             return arr.concat(data);
@@ -71,7 +78,7 @@ export function useRealtime(websiteId: string) {
         .sort(thenby.firstBy('y', -1)),
     );
 
-    data.visitors = data.sessions.reduce((arr, val) => {
+    data.currentVisitors = data.visitors.reduce((arr, val) => {
       if (!arr.find(({ id }) => id === val.id)) {
         return arr.concat(val);
       }
