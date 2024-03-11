@@ -1,4 +1,4 @@
-import { getHours, startOfHour, startOfMonth, subHours } from 'date-fns';
+import { startOfHour, startOfMonth } from 'date-fns';
 import { hash } from 'next-basics';
 import { v4, v5, validate } from 'uuid';
 
@@ -13,10 +13,7 @@ export function salt() {
 }
 
 export function sessionSalt() {
-  // rotate every 2 hours
-  const hour = getHours(new Date());
-  const date = hour % 2 === 0 ? new Date() : subHours(new Date(), 1);
-  const ROTATING_SALT = hash(startOfHour(date).toUTCString());
+  const ROTATING_SALT = hash(startOfHour(new Date()).toUTCString());
 
   return hash(secret(), ROTATING_SALT);
 }

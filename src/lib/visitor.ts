@@ -1,4 +1,4 @@
-import { isUuid, secret, uuid } from 'lib/crypto';
+import { isUuid, secret, sessionSalt, uuid } from 'lib/crypto';
 import { getClientInfo } from 'lib/detect';
 import { parseToken } from 'next-basics';
 import { NextApiRequestCollect } from 'pages/api/send';
@@ -10,6 +10,7 @@ import { loadVisitor, loadWebsite } from './load';
 export async function findVisitor(req: NextApiRequestCollect): Promise<{
   id: any;
   websiteId: string;
+  sessionId: string;
   hostname: string;
   browser: string;
   os: any;
@@ -67,12 +68,14 @@ export async function findVisitor(req: NextApiRequestCollect): Promise<{
     await getClientInfo(req, payload);
 
   const visitorId = uuid(websiteId, hostname, ip, userAgent);
+  const sessionId = uuid(visitorId, sessionSalt());
 
   // Clickhouse does not require visitor lookup
   if (clickhouse.enabled) {
     return {
       id: visitorId,
       websiteId,
+      sessionId,
       hostname,
       browser,
       os: os as any,
@@ -114,7 +117,7 @@ export async function findVisitor(req: NextApiRequestCollect): Promise<{
     }
   }
 
-  return { ...visitor, ownerId: website.userId };
+  return { ...visitor, ownerId: website.userId, sessionId: sessionId };
 }
 
 async function checkUserBlock(userId: string) {
